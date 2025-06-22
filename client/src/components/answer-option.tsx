@@ -1,5 +1,5 @@
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { cn } from "../lib/utils";
+import { Check } from "lucide-react";
 
 interface AnswerOptionProps {
   value: string;
@@ -10,21 +10,49 @@ interface AnswerOptionProps {
 
 export function AnswerOption({ value, text, isSelected, onSelect }: AnswerOptionProps) {
   return (
-    <Label
-      htmlFor={value}
-      className={`block border-2 rounded-xl p-4 cursor-pointer hover:border-medical-light hover:bg-blue-50 transition-all duration-200 ${
-        isSelected ? 'border-medical-blue bg-blue-50' : 'border-gray-200'
-      }`}
+    <div
+      onClick={() => onSelect(value)}
+      className={cn(
+        "relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg",
+        "group",
+        isSelected
+          ? "border-medical-blue bg-blue-50 shadow-md"
+          : "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-25"
+      )}
     >
-      <div className="flex items-center">
-        <RadioGroupItem
-          value={value}
-          id={value}
-          className="mr-3"
-          onClick={() => onSelect(value)}
-        />
-        <span className="font-medium">{text}</span>
+      <div className="flex items-center justify-between">
+        <span className={cn(
+          "text-lg font-medium transition-colors duration-200",
+          isSelected ? "text-medical-blue" : "text-foreground group-hover:text-medical-blue"
+        )}>
+          {text}
+        </span>
+        
+        <div className={cn(
+          "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300",
+          isSelected
+            ? "border-medical-blue bg-medical-blue"
+            : "border-gray-300 group-hover:border-medical-blue"
+        )}>
+          {isSelected && (
+            <Check 
+              size={14} 
+              className="text-white animate-in zoom-in-50 duration-200" 
+            />
+          )}
+        </div>
       </div>
-    </Label>
+      
+      {/* Hover effect overlay */}
+      <div className={cn(
+        "absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 transition-opacity duration-300",
+        "group-hover:opacity-100"
+      )} />
+      
+      {/* Selection indicator */}
+      {isSelected && (
+        <div className="absolute -top-1 -right-1 w-4 h-4 bg-medical-blue rounded-full animate-in zoom-in-50 duration-200" />
+      )}
+    </div>
   );
 }

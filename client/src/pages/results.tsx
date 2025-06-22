@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Check, Eye, Zap, Activity, RotateCcw, Printer, Lightbulb, AlertTriangle, Share2 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Check, Eye, Zap, Activity, RotateCcw, Printer, Lightbulb, AlertTriangle, Share2, TrendingUp, Award, Trophy } from "lucide-react";
 import { useLocation } from "wouter";
-import { calculateScores, getResultInterpretation } from "@/lib/questions";
+import { calculateScores, getResultInterpretation } from "../lib/questions";
+import { motion } from "framer-motion";
+import { AchievementBadge } from "../components/achievement-badge";
 
 export default function Results() {
   const [location, navigate] = useLocation();
@@ -78,144 +80,322 @@ export default function Results() {
     }
   };
 
+  const getScoreColor = (score: number, max: number) => {
+    const percentage = (score / max) * 100;
+    if (percentage >= 80) return "text-red-600";
+    if (percentage >= 60) return "text-orange-600";
+    if (percentage >= 40) return "text-yellow-600";
+    return "text-green-600";
+  };
+
+  const getScoreBarColor = (score: number, max: number) => {
+    const percentage = (score / max) * 100;
+    if (percentage >= 80) return "bg-red-500";
+    if (percentage >= 60) return "bg-orange-500";
+    if (percentage >= 40) return "bg-yellow-500";
+    return "bg-green-500";
+  };
+
+  // 성취 배지 계산
+  const getAchievements = () => {
+    if (!scores) return [];
+    
+    const achievements = [
+      {
+        type: "completion" as const,
+        title: "검사 완료",
+        description: "모든 질문에 답변했습니다",
+        isUnlocked: true
+      },
+      {
+        type: "first" as const,
+        title: "첫 번째 검사",
+        description: "처음으로 검사를 완료했습니다",
+        isUnlocked: true
+      },
+      {
+        type: "accuracy" as const,
+        title: "정확한 답변",
+        description: "모든 질문에 신중하게 답변했습니다",
+        isUnlocked: scores.totalScore > 0
+      },
+      {
+        type: "speed" as const,
+        title: "빠른 완료",
+        description: "5분 이내에 검사를 완료했습니다",
+        isUnlocked: false // 실제로는 시간 측정이 필요
+      }
+    ];
+    
+    return achievements;
+  };
+
   if (!scores || !interpretation) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <motion.div 
+          className="text-center"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-medical-blue mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">결과를 계산하고 있습니다...</p>
-        </div>
+          <p className="mt-4 text-muted-foreground text-lg">결과를 계산하고 있습니다...</p>
+        </motion.div>
       </div>
     );
   }
 
+  const achievements = getAchievements();
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-4xl bg-card rounded-2xl shadow-lg">
-        <CardContent className="p-8 md:p-12">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-success-green rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="text-white" size={32} />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">검사 완료</h1>
-            <p className="text-muted-foreground">성인 ADHD 자가진단 결과입니다</p>
-          </div>
-
-          {/* Score Display */}
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-8 mb-8">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-4">총점</h2>
-              <div className="text-6xl font-bold text-medical-blue mb-2">
-                {scores.totalScore}
-              </div>
-              <p className="text-muted-foreground">72점 만점</p>
-            </div>
-          </div>
-
-          {/* Detailed Scores */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white border-2 border-gray-100 rounded-xl p-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Eye className="text-medical-blue" size={24} />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2">주의력 부족</h3>
-                <div className="text-2xl font-bold text-medical-blue">
-                  {scores.inattentionScore}
-                </div>
-                <p className="text-sm text-muted-foreground">36점 만점</p>
-              </div>
-            </div>
-
-            <div className="bg-white border-2 border-gray-100 rounded-xl p-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Activity className="text-orange-500" size={24} />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2">과다행동</h3>
-                <div className="text-2xl font-bold text-orange-500">
-                  {scores.hyperactivityScore}
-                </div>
-                <p className="text-sm text-muted-foreground">24점 만점</p>
-              </div>
-            </div>
-
-            <div className="bg-white border-2 border-gray-100 rounded-xl p-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Zap className="text-purple-500" size={24} />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2">충동성</h3>
-                <div className="text-2xl font-bold text-purple-500">
-                  {scores.impulsivityScore}
-                </div>
-                <p className="text-sm text-muted-foreground">12점 만점</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Result Interpretation */}
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8">
-            <div className="flex items-start">
-              <Lightbulb className="text-yellow-500 mt-1 mr-3" size={20} />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">결과 해석</h3>
-                <p className="text-muted-foreground mb-4">
-                  귀하의 검사 결과는 <strong>{interpretation.level}</strong>에 해당합니다.
-                  {interpretation.description}
-                </p>
-                <h4 className="font-semibold text-foreground mb-2">권장사항</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  {interpretation.recommendations.map((rec: string, index: number) => (
-                    <li key={index}>• {rec}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Medical Disclaimer */}
-          <div className="bg-red-50 border-l-4 border-red-500 p-6 mb-8">
-            <div className="flex items-start">
-              <AlertTriangle className="text-red-500 mt-1 mr-3" size={20} />
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">의료진 상담 안내</h3>
-                <p className="text-sm text-muted-foreground">
-                  본 검사는 선별용 도구로 의학적 진단을 대체할 수 없습니다.
-                  정확한 진단과 치료를 위해서는 반드시 정신건강의학과 전문의와 상담하시기 바랍니다.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button
-              onClick={handleRetakeTest}
-              variant="outline"
-              className="flex-1 border-2 border-medical-blue text-medical-blue font-semibold hover:bg-blue-50"
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-4xl"
+      >
+        <Card className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border-0">
+          <CardContent className="p-8 md:p-12">
+            <motion.div 
+              className="text-center mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
             >
-              <RotateCcw size={16} className="mr-2" />
-              다시 검사하기
-            </Button>
-            <Button
-              onClick={handleKakaoShare}
-              variant="outline"
-              className="flex-1 border-2 border-green-500 text-green-600 font-semibold hover:bg-green-50"
+              <motion.div 
+                className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <Check className="text-white" size={40} />
+              </motion.div>
+              <h1 className="text-4xl font-bold text-foreground mb-2">검사 완료</h1>
+              <p className="text-xl text-muted-foreground">성인 ADHD 자가진단 결과입니다</p>
+            </motion.div>
+
+            {/* Score Display */}
+            <motion.div 
+              className="bg-gradient-to-r from-blue-50 to-purple-100 rounded-3xl p-8 mb-8 border border-blue-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
             >
-              <Share2 size={16} className="mr-2" />
-              카톡 공유하기
-            </Button>
-            <Button
-              onClick={handlePrintResults}
-              className="flex-1 bg-medical-blue text-white font-semibold hover:bg-blue-700"
+              <div className="text-center">
+                <h2 className="text-3xl font-bold text-foreground mb-4 flex items-center justify-center gap-2">
+                  <Award className="text-yellow-600" size={32} />
+                  총점
+                </h2>
+                <motion.div 
+                  className="text-8xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.8, type: "spring" }}
+                >
+                  {scores.totalScore}
+                </motion.div>
+                <p className="text-muted-foreground text-lg">72점 만점</p>
+              </div>
+            </motion.div>
+
+            {/* Detailed Scores */}
+            <motion.div 
+              className="grid md:grid-cols-3 gap-6 mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
             >
-              <Printer size={16} className="mr-2" />
-              결과 인쇄하기
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+              <motion.div 
+                className="bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Eye className="text-medical-blue" size={32} />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2 text-lg">주의력 부족</h3>
+                  <div className={`text-4xl font-bold mb-2 ${getScoreColor(scores.inattentionScore, 36)}`}>
+                    {scores.inattentionScore}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">36점 만점</p>
+                  
+                  {/* Progress bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <motion.div 
+                      className={`h-3 rounded-full ${getScoreBarColor(scores.inattentionScore, 36)}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(scores.inattentionScore / 36) * 100}%` }}
+                      transition={{ delay: 0.8, duration: 1 }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                className="bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Activity className="text-orange-500" size={32} />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2 text-lg">과다행동</h3>
+                  <div className={`text-4xl font-bold mb-2 ${getScoreColor(scores.hyperactivityScore, 24)}`}>
+                    {scores.hyperactivityScore}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">24점 만점</p>
+                  
+                  {/* Progress bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <motion.div 
+                      className={`h-3 rounded-full ${getScoreBarColor(scores.hyperactivityScore, 24)}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(scores.hyperactivityScore / 24) * 100}%` }}
+                      transition={{ delay: 0.9, duration: 1 }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                className="bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Zap className="text-purple-500" size={32} />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2 text-lg">충동성</h3>
+                  <div className={`text-4xl font-bold mb-2 ${getScoreColor(scores.impulsivityScore, 12)}`}>
+                    {scores.impulsivityScore}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">12점 만점</p>
+                  
+                  {/* Progress bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <motion.div 
+                      className={`h-3 rounded-full ${getScoreBarColor(scores.impulsivityScore, 12)}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(scores.impulsivityScore / 12) * 100}%` }}
+                      transition={{ delay: 1.0, duration: 1 }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Achievements Section */}
+            <motion.div 
+              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+            >
+              <h3 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <Trophy className="text-yellow-600" size={28} />
+                획득한 성취
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {achievements.map((achievement, index) => (
+                  <AchievementBadge
+                    key={index}
+                    type={achievement.type}
+                    title={achievement.title}
+                    description={achievement.description}
+                    isUnlocked={achievement.isUnlocked}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Result Interpretation */}
+            <motion.div 
+              className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-r-xl"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.0, duration: 0.6 }}
+            >
+              <div className="flex items-start">
+                <Lightbulb className="text-yellow-500 mt-1 mr-3" size={24} />
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2 text-lg">결과 해석</h3>
+                  <p className="text-muted-foreground mb-4 text-lg">
+                    귀하의 검사 결과는 <strong className="text-foreground">{interpretation.level}</strong>에 해당합니다.
+                    {interpretation.description}
+                  </p>
+                  <h4 className="font-semibold text-foreground mb-2">권장사항</h4>
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    {interpretation.recommendations.map((rec: string, index: number) => (
+                      <motion.li 
+                        key={index}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1.2 + index * 0.1, duration: 0.3 }}
+                        className="flex items-start gap-2"
+                      >
+                        <span className="text-yellow-500 mt-1">•</span>
+                        {rec}
+                      </motion.li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Medical Disclaimer */}
+            <motion.div 
+              className="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 p-6 mb-8 rounded-r-xl"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.4, duration: 0.6 }}
+            >
+              <div className="flex items-start">
+                <AlertTriangle className="text-red-500 mt-1 mr-3" size={24} />
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2 text-lg">의료진 상담 안내</h3>
+                  <p className="text-sm text-muted-foreground text-lg">
+                    본 검사는 선별용 도구로 의학적 진단을 대체할 수 없습니다.
+                    정확한 진단과 치료를 위해서는 반드시 정신건강의학과 전문의와 상담하시기 바랍니다.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Action Buttons */}
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.6, duration: 0.6 }}
+            >
+              <Button
+                onClick={handleRetakeTest}
+                variant="outline"
+                className="flex-1 border-2 border-medical-blue text-medical-blue font-semibold hover:bg-blue-50 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-[1.02]"
+              >
+                <RotateCcw size={20} className="mr-2" />
+                다시 검사하기
+              </Button>
+              <Button
+                onClick={handleKakaoShare}
+                variant="outline"
+                className="flex-1 border-2 border-green-500 text-green-600 font-semibold hover:bg-green-50 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-[1.02]"
+              >
+                <Share2 size={20} className="mr-2" />
+                카톡 공유하기
+              </Button>
+              <Button
+                onClick={handlePrintResults}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:from-blue-700 hover:to-purple-700 py-4 text-lg rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-lg"
+              >
+                <Printer size={20} className="mr-2" />
+                결과 인쇄하기
+              </Button>
+            </motion.div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }
