@@ -140,7 +140,7 @@ export default function Assessment() {
                   key={index}
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${
                     index === currentQuestion
-                      ? 'bg-medical-blue scale-125'
+                      ? 'bg-blue-600 scale-125'
                       : index < currentQuestion
                       ? 'bg-green-500'
                       : 'bg-gray-300'
