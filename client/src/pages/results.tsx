@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { calculateScores, getResultInterpretation } from "../lib/questions";
 import { motion } from "framer-motion";
 import { AchievementBadge } from "../components/achievement-badge";
+import { ResultsTopAd, ResultsMiddleAd, ResultsBottomAd } from "../components/adsense-ad";
 
 export default function Results() {
   const [location, navigate] = useLocation();
@@ -199,6 +200,9 @@ export default function Results() {
               </div>
             </motion.div>
 
+            {/* AdSense 광고 1 - 결과 상단 */}
+            <ResultsTopAd />
+
             {/* Detailed Scores */}
             <motion.div 
               className="grid md:grid-cols-3 gap-6 mb-8"
@@ -285,6 +289,9 @@ export default function Results() {
               </motion.div>
             </motion.div>
 
+            {/* AdSense 광고 2 - 상세 점수 후 */}
+            <ResultsMiddleAd />
+
             {/* Achievements Section */}
             <motion.div 
               className="mb-8"
@@ -362,12 +369,15 @@ export default function Results() {
               </div>
             </motion.div>
 
+            {/* AdSense 광고 3 - 액션 버튼 전 */}
+            <ResultsBottomAd />
+
             {/* Action Buttons */}
             <motion.div 
               className="flex flex-col sm:flex-row gap-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.6, duration: 0.6 }}
+              transition={{ delay: 1.7, duration: 0.6 }}
             >
               <Button
                 onClick={handleRetakeTest}
