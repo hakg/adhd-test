@@ -6,19 +6,12 @@ export const ADSENSE_CONFIG = {
   // 광고 슬롯 ID들 (실제 AdSense에서 생성한 슬롯 ID로 교체하세요)
   AD_SLOTS: {
     // 반응형 광고
-    RESPONSIVE_1: '1234567890',
-    RESPONSIVE_2: '1234567891',
-    
-    // 배너 광고
-    BANNER: '1234567892',
-    
-    // 사각형 광고
-    RECTANGLE: '1234567893',
+    RESPONSIVE_1: '3979136788',
+    RESPONSIVE_2: '3236900755',
     
     // 결과 페이지 전용 광고
-    RESULTS_TOP: '1234567894',
-    RESULTS_MIDDLE: '1234567895',
-    RESULTS_BOTTOM: '1234567896',
+    RESULTS_TOP: '3979136788',
+    RESULTS_BOTTOM: '3236900755',
   },
   
   // 광고 표시 설정

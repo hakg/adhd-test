@@ -151,28 +151,6 @@ export function AdSenseAd({
 }
 
 // 다양한 광고 크기별 컴포넌트들
-export function BannerAd() {
-  return (
-    <AdSenseAd
-      adSlot={ADSENSE_CONFIG.AD_SLOTS.BANNER}
-      adFormat="banner"
-      className="w-full max-w-728 h-90 mx-auto"
-      style={{ minHeight: '90px' }}
-    />
-  );
-}
-
-export function RectangleAd() {
-  return (
-    <AdSenseAd
-      adSlot={ADSENSE_CONFIG.AD_SLOTS.RECTANGLE}
-      adFormat="rectangle"
-      className="w-full max-w-300 h-250 mx-auto"
-      style={{ minHeight: '250px' }}
-    />
-  );
-}
-
 export function ResponsiveAd() {
   return (
     <AdSenseAd
@@ -192,17 +170,6 @@ export function ResultsTopAd() {
       adFormat="auto"
       className="w-full mb-8"
       style={{ minHeight: '90px' }}
-    />
-  );
-}
-
-export function ResultsMiddleAd() {
-  return (
-    <AdSenseAd
-      adSlot={ADSENSE_CONFIG.AD_SLOTS.RESULTS_MIDDLE}
-      adFormat="rectangle"
-      className="w-full max-w-300 h-250 mx-auto mb-8"
-      style={{ minHeight: '250px' }}
     />
   );
 }

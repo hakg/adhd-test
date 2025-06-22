@@ -6,7 +6,7 @@ import { useLocation } from "wouter";
 import { calculateScores, getResultInterpretation } from "../lib/questions";
 import { motion } from "framer-motion";
 import { AchievementBadge } from "../components/achievement-badge";
-import { ResultsTopAd, ResultsMiddleAd, ResultsBottomAd } from "../components/adsense-ad";
+import { ResultsTopAd, ResultsBottomAd } from "../components/adsense-ad";
 
 export default function Results() {
   const [location, navigate] = useLocation();
@@ -290,7 +290,7 @@ export default function Results() {
             </motion.div>
 
             {/* AdSense 광고 2 - 상세 점수 후 */}
-            <ResultsMiddleAd />
+            <ResultsBottomAd />
 
             {/* Achievements Section */}
             <motion.div 
@@ -368,9 +368,6 @@ export default function Results() {
                 </div>
               </div>
             </motion.div>
-
-            {/* AdSense 광고 3 - 액션 버튼 전 */}
-            <ResultsBottomAd />
 
             {/* Action Buttons */}
             <motion.div 
